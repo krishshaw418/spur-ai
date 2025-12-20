@@ -12,6 +12,7 @@ const userInput = z.object({
 
 export const chatController = async (req: Request, res: Response) => {
     const parsedInput = userInput.safeParse(req.body);
+    console.log(req.body);
     if (!parsedInput.success) {
         return res.status(400).json({ message: "Invalid input!", error: JSON.parse(parsedInput.error.message)[0].message });
     }
@@ -22,16 +23,24 @@ export const chatController = async (req: Request, res: Response) => {
         }
 
         if (parsedInput.data.sessionId) {
+            console.log(parsedInput.data.sessionId);
             if (parsedInput.data.sessionId.length !== 0) {
                 const llmResponse = await generateReply(parsedInput.data.message, parsedInput.data.sessionId);
-                return res.status(200).json({ reply: llmResponse?.reply, sessionId: llmResponse?.sessionId});
+                return res.status(200).json({ reply: llmResponse?.reply, timestamp: llmResponse?.timestamp, role: llmResponse?.role, sessionId: llmResponse?.sessionId });
             }
             return res.status(400).json({ message: "Please enter your prompt!", error: "Empty sessionId field!" });
         }
 
         const newConversation = await prisma.conversation.create({});
         const llmResponse = await generateReply(parsedInput.data.message, newConversation.id);
-        res.status(200).json({ reply: llmResponse?.reply, sessionId: llmResponse?.sessionId});
+        res.cookie("sessionId", newConversation.id, {
+            httpOnly: false,
+            secure: true,
+            sameSite: "none",
+            maxAge: 60 * 60 * 1000,
+            path: "/"
+        });
+        res.status(200).json({ reply: llmResponse?.reply, timestamp: llmResponse?.timestamp, role: llmResponse?.role, sessionId: llmResponse?.sessionId });
     } catch (error) {
         console.error(error);
 

@@ -91,6 +91,8 @@ export const generateReply = async (msg: string, sessionId: string) => {
             }
             return {
                 reply: response.text,
+                timestamp: modelReply.timeStamp,
+                role: "model",
                 sessionId
             }
         }
@@ -153,34 +155,35 @@ export const generateReply = async (msg: string, sessionId: string) => {
                     order: i
                 }
             })
+        }
+        const m = 10;
+        const modelRespChunks = Array.from({ length: Math.ceil(response?.text.length / m) }, (v, i) =>
+            (response.text)?.slice(i * m, i * m + m)
+        ) as string[];
 
-            const m = 10;
-            const modelRespChunks = Array.from({ length: Math.ceil(response?.text.length / m) }, (v, i) =>
-                (response.text)?.slice(i * m, i * m + m)
-            ) as string[];
+        // new record of model response
+        const modelReply = await prisma.message.create({
+            data: {
+                conversationId: sessionId,
+                role: "model"
+            }
+        });
 
-            // new record of model response
-            const modelReply = await prisma.message.create({
+        for (let i = 0; i < modelRespChunks.length; i++) {
+            await prisma.part.create({
                 data: {
-                    conversationId: sessionId,
-                    role: "model"
+                    messageId: modelReply.id,
+                    text: modelRespChunks[i],
+                    order: i
                 }
-            });
+            })
+        }
 
-            for (let i = 0; i < modelRespChunks.length; i++) {
-                await prisma.part.create({
-                    data: {
-                        messageId: modelReply.id,
-                        text: modelRespChunks[i],
-                        order: i
-                    }
-                })
-            }
-
-            return {
-                reply: response.text,
-                sessionId
-            }
+        return {
+            reply: response.text,
+            timestamp: modelReply.timeStamp,
+            role: "model",
+            sessionId
         }
     } catch (error) {
         throw error;

@@ -14,7 +14,8 @@ export const fetchConveration = async (conversationId: string) => {
                     },
                     orderBy: { order: 'asc' }
                 },
-                role: true
+                role: true,
+                timeStamp: true
             }
         });
 
@@ -30,7 +31,7 @@ export const fetchConveration = async (conversationId: string) => {
                 return prt.text
             }).join("");
 
-            return { message: message, role: msg.role }
+            return { message: message, role: msg.role, timestamp: msg.timeStamp }
         })
 
         return {

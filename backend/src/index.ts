@@ -15,7 +15,10 @@ app.use((err: any, req: any, res: any, next: any) => {
   }
   next(err);
 });
-app.use(cors());
+app.use(cors({
+  origin: [`${process.env.BASE_URL}`],
+  credentials: true
+}));
 
 app.use("/api", chatRoutes);
 
