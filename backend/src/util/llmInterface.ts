@@ -1,5 +1,6 @@
 import { GoogleGenAI, type Content } from "@google/genai";
 import { prisma } from "../lib/prisma";
+import faqs from '../faqs.json';
 
 const apiKey = process.env.GEMINI_API_KEY
 
@@ -24,7 +25,7 @@ export const generateReply = async (msg: string, sessionId: string) => {
             const chat = gemini.chats.create({
                 model: "gemini-2.5-flash",
                 config: {
-                    systemInstruction: "You are a helpful support agent for a small e-commerce store. Answer clearly and concisely.",
+                    systemInstruction: `You are a customer support agent for SpurStore. Here is our store's policy information:${faqs} Use this information to answer customer questions accurately. Always be helpful, friendly, and refer to these exact policies when answering questions about shipping, returns, support hours, etc.`,
                     thinkingConfig: {
                         thinkingBudget: 0
                     }
@@ -116,7 +117,7 @@ export const generateReply = async (msg: string, sessionId: string) => {
             model: "gemini-2.5-flash",
             history: oldConversation,
             config: {
-                systemInstruction: "You are a helpful support agent for a small e-commerce store. Answer clearly and concisely.",
+                systemInstruction:`You are a customer support agent for SpurStore. Here is our store's policy information:${faqs} Use this information to answer customer questions accurately. Always be helpful, friendly, and refer to these exact policies when answering questions about shipping, returns, support hours, etc.`,
                 thinkingConfig: {
                     thinkingBudget: 0
                 }

@@ -1,0 +1,212 @@
+{
+  "store_info": {
+    "name": "SpurStore",
+    "support_email": "support@spurstore.com",
+    "support_phone": "1-800-XXX-XXXX",
+    "website": "www.spurstore.com"
+  },
+  "shipping": {
+    "domestic": {
+      "free_shipping_threshold": 50,
+      "standard": {
+        "cost": 5.99,
+        "delivery_time": "5-7 business days",
+        "free_over": 50
+      },
+      "express": {
+        "cost": 12.99,
+        "delivery_time": "2-3 business days"
+      },
+      "overnight": {
+        "cost": 24.99,
+        "delivery_time": "1 business day"
+      }
+    },
+    "international": {
+      "available_countries": 100,
+      "standard": {
+        "cost_range": "15.99-35.99",
+        "delivery_time": "10-15 business days",
+        "note": "Cost depends on destination"
+      },
+      "express": {
+        "cost": 45.99,
+        "delivery_time": "5-7 business days"
+      }
+    },
+    "processing": {
+      "cutoff_time": "2:00 PM EST",
+      "cutoff_days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      "weekend_orders": "Ship on Monday",
+      "tracking_provided": true,
+      "tracking_email_time": "24 hours after shipment"
+    }
+  },
+  "returns": {
+    "window_days": 30,
+    "start_date": "delivery date",
+    "conditions": {
+      "must_be_unused": true,
+      "must_be_unworn": true,
+      "original_tags_required": true,
+      "original_packaging_required": true
+    },
+    "non_returnable_items": [
+      "final sale items",
+      "opened cosmetics",
+      "personalized items"
+    ],
+    "process": {
+      "initiation_methods": [
+        "account dashboard",
+        "email support@yourstore.com"
+      ],
+      "return_shipping_cost": 6.99,
+      "free_return_shipping_for": ["defective items", "wrong item sent"]
+    },
+    "refunds": {
+      "processing_time": "5-7 business days",
+      "processing_starts": "after return received",
+      "refund_method": "original payment method"
+    },
+    "exchanges": {
+      "allowed": true,
+      "free_for": ["different sizes", "different colors"],
+      "window_days": 30,
+      "shipping_cost": 0
+    }
+  },
+  "support_hours": {
+    "live_chat": {
+      "weekday": {
+        "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        "hours": "9:00 AM - 8:00 PM EST"
+      },
+      "weekend": {
+        "days": ["Saturday", "Sunday"],
+        "hours": "10:00 AM - 6:00 PM EST"
+      }
+    },
+    "email": {
+      "address": "support@yourstore.com",
+      "weekday": {
+        "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        "hours": "9:00 AM - 8:00 PM EST"
+      },
+      "weekend": {
+        "days": ["Saturday", "Sunday"],
+        "hours": "10:00 AM - 6:00 PM EST"
+      },
+      "response_time": "within 24 hours on business days"
+    },
+    "phone": {
+      "number": "1-800-XXX-XXXX",
+      "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      "hours": "9:00 AM - 6:00 PM EST"
+    },
+    "ai_assistant": {
+      "available": "24/7",
+      "description": "Instant answers to common questions"
+    }
+  },
+  "order_management": {
+    "tracking": {
+      "methods": [
+        "tracking number in confirmation email",
+        "account dashboard"
+      ],
+      "tracking_provided": true
+    },
+    "cancellation": {
+      "allowed_within": "1 hour of placement",
+      "method": "contact support immediately"
+    },
+    "modification": {
+      "address_change": {
+        "allowed": "before shipment",
+        "method": "contact support immediately"
+      },
+      "item_change": {
+        "allowed": false,
+        "alternative": "cancel and place new order within 1 hour"
+      }
+    },
+    "lost_or_delayed": {
+      "contact_threshold_domestic": "5+ business days with no tracking movement",
+      "contact_threshold_international": "10+ business days with no tracking movement",
+      "action": "contact support"
+    }
+  },
+  "payment": {
+    "accepted_methods": [
+      "Visa",
+      "Mastercard",
+      "American Express",
+      "Discover",
+      "PayPal",
+      "Apple Pay",
+      "Google Pay"
+    ],
+    "currency": "USD",
+    "international_billing": "charged in USD",
+    "price_matching": {
+      "available": true,
+      "window_days": 7,
+      "exclusions": ["clearance items", "marketplace sellers"]
+    },
+    "promotional_codes": {
+      "limit_per_order": 1,
+      "combinable": false,
+      "note": "Cannot combine with other offers unless specified"
+    }
+  },
+  "account": {
+    "benefits": [
+      "faster checkout",
+      "order tracking",
+      "exclusive offers",
+      "saved addresses",
+      "order history"
+    ],
+    "guest_checkout": {
+      "available": true,
+      "recommendation": "account recommended for order tracking"
+    },
+    "password_reset": {
+      "methods": [
+        "Forgot Password link",
+        "contact support"
+      ]
+    },
+    "data_privacy": {
+      "third_party_sharing": false,
+      "note": "We never share personal information with third parties for marketing purposes"
+    }
+  },
+  "products": {
+    "stock": {
+      "in_stock_ships": "within 1-2 business days",
+      "pre_order_ships": "on release date (noted on product page)"
+    },
+    "size_guides": {
+      "available": "on each product page",
+      "personalized_help": "contact support for sizing assistance"
+    },
+    "reviews": {
+      "verified_purchases": true,
+      "purpose": "help customers make informed decisions"
+    }
+  },
+  "policies": {
+    "warranty": {
+      "available": true,
+      "duration": "manufacturer warranty varies by product",
+      "details": "see product page or contact support"
+    },
+    "price_adjustment": {
+      "available": true,
+      "window_days": 7,
+      "conditions": "if item goes on sale within 7 days of purchase"
+    }
+  }
+}
