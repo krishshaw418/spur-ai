@@ -2,6 +2,7 @@ import { GoogleGenAI, type Content } from "@google/genai";
 import { prisma } from "../lib/prisma";
 import faqs from '../faqs.json';
 import removeMd from "remove-markdown";
+import { getRedisClient } from "../lib/redis";
 
 const apiKey = process.env.GEMINI_API_KEY
 
@@ -15,6 +16,9 @@ export const generateReply = async (msg: string, sessionId: string) => {
     });
     
     try {
+
+        const client = await getRedisClient();
+
         const messages = await prisma.message.findMany({
             where: {
                 conversationId: sessionId
@@ -40,6 +44,8 @@ export const generateReply = async (msg: string, sessionId: string) => {
             if (!response.text) {
                 return {
                     reply: "Error",
+                    timestamp: new Date(),
+                    role: "model",
                     sessionId: sessionId
                 }
             }
@@ -68,6 +74,15 @@ export const generateReply = async (msg: string, sessionId: string) => {
                 })
             }
 
+            // caching in redis
+            await client.rPush(`user-session:${sessionId}`, JSON.stringify({
+                message: msg,
+                role: newUserMessage.role,
+                timestamp: newUserMessage.timeStamp
+            }));
+
+            console.log("User msg cached in redis!");
+
             const plainText = removeMd(response.text);
 
             const x = 10;
@@ -93,12 +108,24 @@ export const generateReply = async (msg: string, sessionId: string) => {
                     }
                 })
             }
-            return {
+
+            // caching in redis
+            await client.rPush(`user-session:${sessionId}`, JSON.stringify({
+                message: plainText,
+                role: modelReply.role,
+                timestamp: modelReply.timeStamp
+            }));
+
+            console.log("Model response cached in redis!");
+
+            const result = {
                 reply: plainText,
                 timestamp: modelReply.timeStamp,
                 role: "model",
                 sessionId
-            }
+            };
+
+            return result;
         }
 
         // If its a continuation of an old conversation
@@ -134,7 +161,9 @@ export const generateReply = async (msg: string, sessionId: string) => {
         if (!response.text) {
             return {
                 reply: "Error",
-                sessionId
+                sessionId,
+                timestamp: new Date(),
+                role: "model"
             }
         }
 
@@ -161,6 +190,16 @@ export const generateReply = async (msg: string, sessionId: string) => {
             })
         }
 
+        await client.rPush(`user-session:${sessionId}`, JSON.stringify({
+            message: msg,
+            role: newUserMessage.role,
+            timestamp: newUserMessage.timeStamp
+        }));
+
+        await client.expire(`user-session:${sessionId}`, 3600);
+
+        console.log("User msg cached in redis!");
+
         const plainText = removeMd(response.text);
 
         const m = 10;
@@ -186,12 +225,22 @@ export const generateReply = async (msg: string, sessionId: string) => {
             })
         }
 
-        return {
+        await client.rPush(`user-session:${sessionId}`, JSON.stringify({
+            message: plainText,
+            role: modelReply.role,
+            timestamp: modelReply.timeStamp
+        }));
+
+        console.log("Model reply cached in redis!");
+
+        const result = {
             reply: plainText,
             timestamp: modelReply.timeStamp,
             role: "model",
             sessionId
-        }
+        };
+
+        return result;
     } catch (error) {
         throw error;
     }

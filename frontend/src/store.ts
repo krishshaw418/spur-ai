@@ -15,9 +15,14 @@ export const getPreviousConversation = async (conversationId: string) => {
 
     return data.chatHistory;
 
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof AxiosError) {
-      toast.error(error.response?.data.message);
+      if (error.response) {
+        toast.error(error.response?.data.message);
+      }
+      else {
+        toast.error(error.message);
+      }
       console.error(error);
     }
   }

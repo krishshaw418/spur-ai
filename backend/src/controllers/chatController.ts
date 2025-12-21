@@ -32,6 +32,7 @@ export const chatController = async (req: Request, res: Response) => {
         }
 
         const newConversation = await prisma.conversation.create({});
+
         const llmResponse = await generateReply(parsedInput.data.message, newConversation.id);
         res.cookie("sessionId", newConversation.id, {
             httpOnly: false,
