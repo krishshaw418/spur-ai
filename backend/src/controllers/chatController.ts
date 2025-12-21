@@ -26,7 +26,7 @@ export const chatController = async (req: Request, res: Response) => {
             console.log(parsedInput.data.sessionId);
             if (parsedInput.data.sessionId.length !== 0) {
                 const llmResponse = await generateReply(parsedInput.data.message, parsedInput.data.sessionId);
-                return res.status(200).json({ reply: llmResponse?.reply, timestamp: llmResponse?.timestamp, role: llmResponse?.role, sessionId: llmResponse?.sessionId });
+                return res.status(200).json({ reply: llmResponse?.reply, timestamp: llmResponse?.timestamp, role: llmResponse?.role });
             }
             return res.status(400).json({ message: "Please enter your prompt!", error: "Empty sessionId field!" });
         }
@@ -34,14 +34,7 @@ export const chatController = async (req: Request, res: Response) => {
         const newConversation = await prisma.conversation.create({});
 
         const llmResponse = await generateReply(parsedInput.data.message, newConversation.id);
-        res.cookie("sessionId", newConversation.id, {
-            httpOnly: false,
-            secure: true,
-            sameSite: "none",
-            maxAge: 60 * 60 * 1000,
-            path: "/"
-        });
-        res.status(200).json({ reply: llmResponse?.reply, timestamp: llmResponse?.timestamp, role: llmResponse?.role, sessionId: llmResponse?.sessionId });
+        res.status(200).json({ reply: llmResponse?.reply, timestamp: llmResponse?.timestamp, role: llmResponse?.role, userId: `user-session:${llmResponse?.sessionId}` });
     } catch (error) {
         console.error(error);
 
