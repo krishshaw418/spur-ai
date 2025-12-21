@@ -1,6 +1,7 @@
 import { GoogleGenAI, type Content } from "@google/genai";
 import { prisma } from "../lib/prisma";
 import faqs from '../faqs.json';
+import removeMd from "remove-markdown";
 
 const apiKey = process.env.GEMINI_API_KEY
 
@@ -25,10 +26,10 @@ export const generateReply = async (msg: string, sessionId: string) => {
             const chat = gemini.chats.create({
                 model: "gemini-2.5-flash",
                 config: {
-                    systemInstruction: `You are a customer support agent for SpurStore. Here is our store's policy information:${faqs} Use this information to answer customer questions accurately. Always be helpful, friendly, and refer to these exact policies when answering questions about shipping, returns, support hours, etc.`,
+                    systemInstruction: `You are a customer support agent for SpurStore. Here is our store's policy information:${faqs} in json format. Use this information to answer customer questions accurately. Always be helpful, friendly, and refer to these exact policies when answering questions about shipping, returns, support hours, etc.`,
                     thinkingConfig: {
                         thinkingBudget: 0
-                    }
+                    },
                 }
             });
 
@@ -67,10 +68,12 @@ export const generateReply = async (msg: string, sessionId: string) => {
                 })
             }
 
+            const plainText = removeMd(response.text);
+
             const x = 10;
             // breakdown model's response into chunks
-            const modelRespChunks = Array.from({ length: Math.ceil(response?.text.length / x) }, (v, i) =>
-                (response.text)?.slice(i * x, i * x + x)
+            const modelRespChunks = Array.from({ length: Math.ceil(plainText.length / x) }, (v, i) =>
+                (plainText)?.slice(i * x, i * x + x)
             ) as string[];
 
             // new record of model response
@@ -91,7 +94,7 @@ export const generateReply = async (msg: string, sessionId: string) => {
                 })
             }
             return {
-                reply: response.text,
+                reply: plainText,
                 timestamp: modelReply.timeStamp,
                 role: "model",
                 sessionId
@@ -157,9 +160,12 @@ export const generateReply = async (msg: string, sessionId: string) => {
                 }
             })
         }
+
+        const plainText = removeMd(response.text);
+
         const m = 10;
-        const modelRespChunks = Array.from({ length: Math.ceil(response?.text.length / m) }, (v, i) =>
-            (response.text)?.slice(i * m, i * m + m)
+        const modelRespChunks = Array.from({ length: Math.ceil(plainText.length / m) }, (v, i) =>
+            (plainText)?.slice(i * m, i * m + m)
         ) as string[];
 
         // new record of model response
@@ -181,7 +187,7 @@ export const generateReply = async (msg: string, sessionId: string) => {
         }
 
         return {
-            reply: response.text,
+            reply: plainText,
             timestamp: modelReply.timeStamp,
             role: "model",
             sessionId

@@ -59,7 +59,7 @@
     "process": {
       "initiation_methods": [
         "account dashboard",
-        "email support@yourstore.com"
+        "email support@spurstore.com"
       ],
       "return_shipping_cost": 6.99,
       "free_return_shipping_for": ["defective items", "wrong item sent"]
@@ -88,7 +88,7 @@
       }
     },
     "email": {
-      "address": "support@yourstore.com",
+      "address": "support@spurstore.com",
       "weekday": {
         "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
         "hours": "9:00 AM - 8:00 PM EST"

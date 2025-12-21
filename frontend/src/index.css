@@ -74,3 +74,27 @@
     font-family: 'JetBrains Mono', monospace;
   }
 }
+
+/* Hide scrollbar track but keep scrolling */
+.scrollbar-invisible {
+  scrollbar-width: thin;          /* Firefox */
+  scrollbar-color: rgba(0,0,0,0.4) transparent;
+}
+
+/* Chrome, Edge, Safari */
+.scrollbar-invisible::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-invisible::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-invisible::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.4);
+  border-radius: 9999px;
+}
+
+.scrollbar-invisible::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.6);
+}

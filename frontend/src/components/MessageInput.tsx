@@ -47,7 +47,8 @@ export const MessageInput = () => {
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
                 'disabled:cursor-not-allowed disabled:opacity-50',
                 'transition-all duration-200',
-                'min-h-[52px] max-h-[200px] overflow-y-auto'
+                'min-h-[52px] max-h-[200px] overflow-y-auto',
+                'scrollbar-invisible'
               )}
               placeholder="Type your message..."
               value={inputValue}
