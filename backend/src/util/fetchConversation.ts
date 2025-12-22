@@ -1,20 +1,20 @@
 import { prisma } from "../lib/prisma";
 import { getRedisClient } from "../lib/redis";
 
-export const fetchConveration = async (conversationId: string) => {
+export const fetchConversation = async (userId: string, conversationId: string) => {
 
     try {
         const client = await getRedisClient();
 
         const rawMessages = await client.lRange(
-            `user-session:${conversationId}`,
+            `user-session_${userId}:${conversationId}`,
             0,
             -1
         );
         
         const messages = rawMessages.map((msg) => {
             return JSON.parse(msg);
-        })
+        });
 
         if (messages.length === 0) {
             const pastMessages = await prisma.message.findMany({
@@ -47,6 +47,8 @@ export const fetchConveration = async (conversationId: string) => {
 
                 return { message: message, role: msg.role, timestamp: msg.timeStamp }
             })
+
+            console.log("Returned from db");
 
             return {
                 success: true,

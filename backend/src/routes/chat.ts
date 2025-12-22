@@ -1,9 +1,11 @@
 import { Router } from "express";
-import { chatController, getOldConversation } from "../controllers/chatController"
+import { chatController, getOldConversation, getOldSessions, createNewSession } from "../controllers/chatController"
 
 const router = Router();
 
-router.post("/chat/message", chatController);
 router.get("/chat", getOldConversation);
+router.post("/chat/message", chatController);
+router.post("/chat/new", createNewSession);
+router.get("/chat/:userId", getOldSessions);
 
 export default router;

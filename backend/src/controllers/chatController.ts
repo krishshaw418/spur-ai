@@ -1,17 +1,12 @@
 import type { Request, Response } from "express";
 import { generateReply } from "../util/llmInterface";
-import { fetchConveration } from "../util/fetchConversation";
-import * as z from "zod";
+import { fetchConversation } from "../util/fetchConversation";
 import { prisma } from "../lib/prisma";
 import { ApiError } from "@google/genai";
-
-const userInput = z.object({
-    message: z.string().max(250),
-    sessionId: z.optional(z.string().min(3))
-})
+import { newMessageInput, fetchConversationInput, userIdSchema } from "../zodSchema";
 
 export const chatController = async (req: Request, res: Response) => {
-    const parsedInput = userInput.safeParse(req.body);
+    const parsedInput = newMessageInput.safeParse(req.body);
     console.log(req.body);
     if (!parsedInput.success) {
         return res.status(400).json({ message: "Invalid input!", error: JSON.parse(parsedInput.error.message)[0].message });
@@ -22,19 +17,36 @@ export const chatController = async (req: Request, res: Response) => {
             return res.status(400).json({ message: "Please enter your prompt!", error: "Empty message field!" });
         }
 
-        if (parsedInput.data.sessionId) {
-            console.log(parsedInput.data.sessionId);
-            if (parsedInput.data.sessionId.length !== 0) {
-                const llmResponse = await generateReply(parsedInput.data.message, parsedInput.data.sessionId);
-                return res.status(200).json({ reply: llmResponse?.reply, timestamp: llmResponse?.timestamp, role: llmResponse?.role });
+        if (parsedInput.data.userId) {
+            if (parsedInput.data.sessionId) {
+                console.log(parsedInput.data.sessionId);
+                if (parsedInput.data.sessionId.length !== 0) {
+                    const llmResponse = await generateReply(parsedInput.data.userId, parsedInput.data.message, parsedInput.data.sessionId);
+                    return res.status(200).json({ reply: llmResponse?.reply, timestamp: llmResponse?.timestamp, role: llmResponse?.role });
+                }
+                return res.status(400).json({ message: "Please enter your prompt!", error: "Empty sessionId field!" });
             }
-            return res.status(400).json({ message: "Please enter your prompt!", error: "Empty sessionId field!" });
+
+            const newConversation = await prisma.conversation.create({
+                data: {
+                    userId: parsedInput.data.userId
+                }
+            });
+
+            const llmResponse = await generateReply(parsedInput.data.userId, parsedInput.data.message, newConversation.id);
+            res.status(200).json({ reply: llmResponse?.reply, timestamp: llmResponse?.timestamp, role: llmResponse?.role, userId: `user-session:${llmResponse?.sessionId}` });
+        } else {
+            const newUser = await prisma.user.create({});
+
+            const newConversation = await prisma.conversation.create({
+                data: {
+                    userId: newUser.id
+                }
+            });
+
+            const llmResponse = await generateReply(newUser.id, parsedInput.data.message, newConversation.id);
+            res.status(200).json({ reply: llmResponse?.reply, timestamp: llmResponse?.timestamp, role: llmResponse?.role, userId: `${newUser.id}:${llmResponse?.sessionId}` });
         }
-
-        const newConversation = await prisma.conversation.create({});
-
-        const llmResponse = await generateReply(parsedInput.data.message, newConversation.id);
-        res.status(200).json({ reply: llmResponse?.reply, timestamp: llmResponse?.timestamp, role: llmResponse?.role, userId: `user-session:${llmResponse?.sessionId}` });
     } catch (error) {
         console.error(error);
 
@@ -66,23 +78,71 @@ export const chatController = async (req: Request, res: Response) => {
     }
 }
 
-const conversationId = z.object({
-    conversationId: z.string()
-})
-
 export const getOldConversation = async (req: Request, res: Response) => {
-    const parsedInput = conversationId.safeParse(req.query);
+    const parsedInput = fetchConversationInput.safeParse(req.query);
 
     if (!parsedInput.success) {
         return res.status(400).json({ message: "Invalid Input!", error: JSON.parse(parsedInput.error.message)[0].message });
     }
 
     try {
-        const result = await fetchConveration(parsedInput.data.conversationId);
+        console.log("from controller: ", parsedInput.data.userId);
+        const result = await fetchConversation(parsedInput.data.userId, parsedInput.data.conversationId);
         if (!result.success) {
             return res.status(404).json({ success: result.success, message: result.message });
         }
         res.status(200).json({ success: result.success, chatHistory: result.messages });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Something went wrong!" });
+    }
+}
+
+export const getOldSessions = async (req: Request, res: Response) => {
+
+    const parsedInput = userIdSchema.safeParse(req.params);
+
+    if (!parsedInput.success) {
+        return res.status(400).json({ message: "Invalid Input!", error: JSON.parse(parsedInput.error.message)[0].message })
+    }
+
+    try {
+        const conversationIds = await prisma.conversation.findMany({
+            where: {
+                userId: parsedInput.data.userId
+            },
+            select: {
+                id: true
+            }
+        });
+
+        if (conversationIds.length === 0) {
+            return res.status(404).json({ message: "No previous sessions found for the given userId" });
+        } 
+
+        res.status(200).json({ sessionIds: conversationIds });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Something went wrong!" });
+    }
+}
+
+export const createNewSession = async (req: Request, res: Response) => {
+    const parsedInput = userIdSchema.safeParse(req.body);
+    console.log(req.body);
+
+    if (!parsedInput.success) {
+        return res.status(400).json({ message: "Invalid Input!", error: JSON.parse(parsedInput.error.message)[0].message })
+    }
+
+    try {
+        const newConversation = await prisma.conversation.create({
+            data: {
+                userId: parsedInput.data.userId
+            }
+        });
+
+        res.status(200).json({ sessionId: newConversation.id });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: "Something went wrong!" });
