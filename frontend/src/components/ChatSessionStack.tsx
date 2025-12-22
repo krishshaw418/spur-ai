@@ -39,18 +39,18 @@ function ChatSessionStack() {
       }
     }
     fetchSessionIds();
-  }, [Id, sessionIds]);
+  }, [Id, userId, setSessionIds]); // Fixed: Added missing dependencies
 
 
   return (
-    <div className={`border-r transition-full duration-300 ${ open ? 'w-64' : 'w-0' } h-screen`}>
-        { open && (<div className="flex flex-col items-center h-full">
+    <div className={`border-r transition-full duration-300 ${open ? 'w-64' : 'w-0'} h-screen`}>
+        {open && (<div className="flex flex-col items-center h-full">
             <span className="font-bold text-lg border-b w-full text-center py-6">
                 Chat History
             </span>
             <div className="overflow-hidden flex flex-col w-full">
                 <div className="flex-1 flex flex-col overflow-auto scrollbar-invisible">
-                  {sessionIds.length !==0 ? sessionIds.map((sessionId) => {
+                  {sessionIds.length !== 0 ? sessionIds.map((sessionId) => {
                     return (
                       <Button onClick={async () => {
                         const userId = Id?.slice(0, Id.indexOf(':'));
@@ -72,14 +72,16 @@ function ChatSessionStack() {
                           addMessage(oldSessionMessage);
                         });
                         }
-                      }} key={sessionId.id} name="" type="button" variant={"ghost"} className="border-b rounded-0">Session {sessionId.id.slice(0, 6)}</Button>
+                      }} key={sessionId.id} type="button" variant={"ghost"} className="border-b rounded-0">
+                        Session {sessionId.id.slice(0, 6)}
+                      </Button>
                     )
-                  }) : (<div className={`text-lg px-8 py-5 text-center ${open} ? "" : "hidden"`}>
+                  }) : (<div className={`text-lg px-8 py-5 text-center ${open ? "" : "hidden"}`}>
                     No History to show yet.
-                  </div> )}
+                  </div>)}
                 </div>
             </div>
-        </div>) }
+        </div>)}
     </div>
   )
 }
