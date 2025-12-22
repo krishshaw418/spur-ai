@@ -179,6 +179,7 @@ npm run preview
 The application should now be running:
 - **Backend API:** `http://localhost:3000`
 - **Frontend:** `http://localhost:4173`
+- NOTE: Since the project use localStorage to identify a user and show his/her chat history, it is recommeded to clear your browser's localStorage keys before testing. 
 
 ## Project Architecture
 
