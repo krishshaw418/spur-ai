@@ -1,4 +1,4 @@
-c-- CreateEnum
+-- CreateEnum
 CREATE TYPE "Role" AS ENUM ('user', 'model');
 
 -- CreateTable

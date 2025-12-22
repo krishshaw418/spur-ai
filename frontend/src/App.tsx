@@ -1,17 +1,21 @@
 import { Chat } from './Chat';
 import RootLayout from './Layout';
 import { getPreviousConversation } from "./store";
-import Cookies from 'js-cookie';
 import { Message } from './types';
-import { useChatStore } from './store';
+import { useChatStore, useSessionStore } from './store';
 import { useEffect } from 'react';
+import ChatSessionStack from './components/ChatSessionStack';
 
 function App() {
+
+  const Id = useSessionStore((state) => state.Id);
+
   useEffect(() => {
     const loadPreviousChat = async () => {
-      const sessionId = Cookies.get('sessionId');
+      const userId = Id.slice(0, Id.indexOf(':'));
+      const sessionId = Id.slice(Id.indexOf(':') + 1);
       if (sessionId) {
-        const messages: Message[] = await getPreviousConversation(sessionId);
+        const messages: Message[] = await getPreviousConversation(userId, sessionId);
         const addMessage = useChatStore.getState().addMessage;
         messages.forEach((msg) => {
           const oldMessage: Message = {
@@ -27,7 +31,8 @@ function App() {
   }, []);
 
   return (
-  <div>
+  <div className='flex'>
+    <ChatSessionStack/>
     <RootLayout>
       <Chat />
     </RootLayout>

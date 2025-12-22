@@ -86,7 +86,6 @@ export const getOldConversation = async (req: Request, res: Response) => {
     }
 
     try {
-        console.log("from controller: ", parsedInput.data.userId);
         const result = await fetchConversation(parsedInput.data.userId, parsedInput.data.conversationId);
         if (!result.success) {
             return res.status(404).json({ success: result.success, message: result.message });
@@ -129,7 +128,6 @@ export const getOldSessions = async (req: Request, res: Response) => {
 
 export const createNewSession = async (req: Request, res: Response) => {
     const parsedInput = userIdSchema.safeParse(req.body);
-    console.log(req.body);
 
     if (!parsedInput.success) {
         return res.status(400).json({ message: "Invalid Input!", error: JSON.parse(parsedInput.error.message)[0].message })

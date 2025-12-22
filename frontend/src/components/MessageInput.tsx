@@ -37,9 +37,10 @@ export const MessageInput = () => {
   return (
     <div className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container max-w-4xl mx-auto p-4">
-        <div className="flex gap-2 items-end">
+        <div className="flex gap-2 items-center">
           <div className="flex-1 relative">
             <textarea
+              name='textarea'
               ref={textareaRef}
               className={cn(
                 'w-full resize-none rounded-2xl border border-input bg-background px-4 py-3 pr-12',
