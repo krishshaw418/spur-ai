@@ -47,7 +47,6 @@ export const Chat = () => {
                 localStorage.setItem('userId', `${userId}:${data.sessionId}`);
                 setId(`${userId}:${data.sessionId}`)
                 const msgs: Message[] = await getPreviousConversation(userId, data.sessionId);
-                if(msgs) {
                   const addMessage = useChatStore.getState().addMessage;
                   const clearMessages = useChatStore.getState().clearMessages;
                   clearMessages();
@@ -59,7 +58,6 @@ export const Chat = () => {
                     };
                     addMessage(oldSessionMessage);
                   })
-                }
                 } catch (error: any) {
                   if (error instanceof AxiosError) {
                     toast.error(error.response?.data.message);
