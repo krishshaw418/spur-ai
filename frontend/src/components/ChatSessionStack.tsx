@@ -60,17 +60,20 @@ function ChatSessionStack() {
                           localStorage.setItem('userId', `${userId}:${conversationId}`);
                           setId(`${userId}:${conversationId}`);
                           const msgs: Message[] = await getPreviousConversation(userId, conversationId);
-                          const addMessage = useChatStore.getState().addMessage;
-                          const clearMessages = useChatStore.getState().clearMessages;
-                          clearMessages();
+                          if (msgs && Array.isArray(msgs)) {
+                            const addMessage = useChatStore.getState().addMessage;
+                            const clearMessages = useChatStore.getState().clearMessages;
+                            clearMessages();
+                            if (msgs.length === 0) return;
                             msgs.forEach((msg) => {
                               const oldSessionMessage: Message = {
                               message: msg.message,
                               role: msg.role,
                               timestamp: new Date(msg.timestamp), // Convert string to Date
                             };
-                          addMessage(oldSessionMessage);
-                        });
+                            addMessage(oldSessionMessage);
+                            });
+                          }
                         }
                       }} key={sessionId.id} type="button" variant={"ghost"} className="border-b rounded-0">
                         Session {sessionId.id.slice(0, 6)}

@@ -18,6 +18,9 @@ export const getPreviousConversation = async (userId: string, conversationId: st
       toast.error("Server is offline. Please try again later.");
     }
     if (error instanceof AxiosError) {
+      if (error.response?.status === 404) {
+        return [];
+      }
       toast.error(error.response?.data.message);
     }
     return;

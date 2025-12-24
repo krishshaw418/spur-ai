@@ -9,6 +9,7 @@ import ChatSessionStack from './components/ChatSessionStack';
 function App() {
 
   const Id = useSessionStore((state) => state.Id);
+  const addMessage = useChatStore.getState().addMessage;
   const clearMessages = useChatStore((state) => state.clearMessages);
 
   useEffect(() => {
@@ -26,7 +27,7 @@ function App() {
           
           if (messages && Array.isArray(messages)) {
             clearMessages();
-            const addMessage = useChatStore.getState().addMessage;
+            if(messages.length === 0) return;
             messages.forEach((msg) => {
               const oldMessage: Message = {
                 message: msg.message,
