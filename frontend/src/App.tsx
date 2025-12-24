@@ -9,6 +9,7 @@ import ChatSessionStack from './components/ChatSessionStack';
 function App() {
 
   const Id = useSessionStore((state) => state.Id);
+  const clearMessages = useChatStore((state) => state.clearMessages);
 
   useEffect(() => {
     const loadPreviousChat = async () => {
@@ -24,6 +25,7 @@ function App() {
           const messages: Message[] = await getPreviousConversation(userId, sessionId);
           
           if (messages && Array.isArray(messages)) {
+            clearMessages();
             const addMessage = useChatStore.getState().addMessage;
             messages.forEach((msg) => {
               const oldMessage: Message = {
